@@ -2,6 +2,7 @@ import Core
 import WebRTC
 import AVFAudio
 import Foundation
+import Observation
 
 public enum ConversationError: Error {
 	case sessionNotFound
@@ -195,6 +196,10 @@ private extension Conversation {
 				entries.append(item)
 			case let .conversationItemDeleted(_, itemId):
 				entries.removeAll { $0.id == itemId }
+			case let .conversationItemDone(_, item, _):
+				if let i = entries.firstIndex(where: { $0.id == item.id }) {
+					entries[i] = item
+				}
 			case let .conversationItemInputAudioTranscriptionCompleted(_, itemId, contentIndex, transcript, _, _):
 				updateEvent(id: itemId) { message in
 					guard case let .inputAudio(audio) = message.content[contentIndex] else { return }
